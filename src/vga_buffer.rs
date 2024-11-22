@@ -1,3 +1,5 @@
+use core::fmt;
+
 use volatile::Volatile;
 
 /// Memory address where the VGA buffer starts
@@ -65,6 +67,13 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
+}
+
 impl Writer {
     /// Write byte to buffer
     pub fn write_byte(&mut self, byte: u8) {
@@ -102,6 +111,7 @@ impl Writer {
 
 /// Test writing to buffer
 pub fn print_something() {
+    use core::fmt::Write;
     let mut writer = Writer {
         column_position: 0,
         colour_code: ColourCode::new(Colour::LightCyan, Colour::Black),
@@ -111,4 +121,5 @@ pub fn print_something() {
     writer.write_byte(b'H');
     writer.write_string("ello, ");
     writer.write_string("wörld!");
+    write!(writer, " Testing out formatting: {}, {:?}", 3, Colour::Pink).unwrap();
 }
