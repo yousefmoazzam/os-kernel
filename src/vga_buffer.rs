@@ -1,3 +1,5 @@
+use volatile::Volatile;
+
 /// Memory address where the VGA buffer starts
 static VGA_BUFFER_START: u32 = 0xB8000;
 
@@ -50,7 +52,7 @@ const BUFFER_HEIGHT: usize = 25;
 /// VGA text buffer
 #[repr(transparent)]
 struct Buffer {
-    chars: [[ScreenCharacter; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenCharacter>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 /// Byte to print when value is not in ASCII range
@@ -74,10 +76,10 @@ impl Writer {
                 }
 
                 let row = BUFFER_HEIGHT - 1;
-                self.buffer.chars[row][self.column_position] = ScreenCharacter {
+                self.buffer.chars[row][self.column_position].write(ScreenCharacter {
                     ascii: byte,
                     colour_code: self.colour_code,
-                };
+                });
                 self.column_position += 1;
             }
         }
