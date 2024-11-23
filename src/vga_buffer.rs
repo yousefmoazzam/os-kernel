@@ -1,5 +1,6 @@
 use core::fmt;
 
+use spin::{Lazy, Mutex};
 use volatile::Volatile;
 
 /// Memory address where the VGA buffer starts
@@ -128,18 +129,10 @@ impl Writer {
     }
 }
 
-/// Test writing to buffer
-pub fn print_something() {
-    use core::fmt::Write;
-    let mut writer = Writer {
+pub static WRITER: Lazy<Mutex<Writer>> = Lazy::new(|| {
+    Mutex::new(Writer {
         column_position: 0,
         colour_code: ColourCode::new(Colour::LightCyan, Colour::Black),
         buffer: unsafe { &mut *(VGA_BUFFER_START as *mut Buffer) },
-    };
-
-    writer.write_byte(b'H');
-    writer.write_string("ello, ");
-    writer.write_string("wörld!");
-    writer.write_new_line();
-    write!(writer, "Testing out formatting: {}, {:?}", 3, Colour::Pink).unwrap();
-}
+    })
+});

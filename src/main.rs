@@ -5,11 +5,14 @@ mod vga_buffer;
 
 use core::panic::PanicInfo;
 
-use vga_buffer::print_something;
-
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    print_something();
+    use core::fmt::Write;
+    vga_buffer::WRITER.lock().write_byte(b'H');
+    vga_buffer::WRITER.lock().write_string("ello, ");
+    vga_buffer::WRITER.lock().write_string("wörld!");
+    vga_buffer::WRITER.lock().write_new_line();
+    write!(vga_buffer::WRITER.lock(), "Testing out formatting: {}", 3,).unwrap();
 
     loop {}
 }
