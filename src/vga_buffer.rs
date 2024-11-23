@@ -94,8 +94,27 @@ impl Writer {
         }
     }
 
-    fn write_new_line(&mut self) {
-        todo!()
+    /// Write newline character to buffer
+    pub fn write_new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let char = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(char);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
+
+    /// Replace all characters in a row with the space character
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenCharacter {
+            ascii: b' ',
+            colour_code: self.colour_code,
+        };
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank);
+        }
     }
 
     /// Write string to buffer
@@ -121,5 +140,6 @@ pub fn print_something() {
     writer.write_byte(b'H');
     writer.write_string("ello, ");
     writer.write_string("wörld!");
-    write!(writer, " Testing out formatting: {}, {:?}", 3, Colour::Pink).unwrap();
+    writer.write_new_line();
+    write!(writer, "Testing out formatting: {}, {:?}", 3, Colour::Pink).unwrap();
 }
