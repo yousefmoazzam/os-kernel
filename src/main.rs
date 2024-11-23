@@ -13,6 +13,11 @@ pub extern "C" fn _start() -> ! {
     vga_buffer::WRITER.lock().write_string("wörld!");
     vga_buffer::WRITER.lock().write_new_line();
     write!(vga_buffer::WRITER.lock(), "Testing out formatting: {}", 3,).unwrap();
+    println!(
+        "Printing with a newline at the end, plus formatting: {}",
+        5.0
+    );
+    print!("Print");
 
     loop {}
 }
